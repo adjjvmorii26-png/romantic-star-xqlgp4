@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Mori: The Journey to Become</title>
+  <style>
+    /* Aesthetics: Dark, introspective—evoking morii's melancholic haze. */
+    body { background: #1a1a1a; color: #e0e0e0; font-family: monospace; text-align: center; padding: 2em; }
+    button { background: #333; color: #fff; border: 1px solid #555; padding: 1em; margin: 1em; cursor: pointer; }
+    button:hover { background: #444; }
+    #output { background: #222; padding: 1em; border: 1px solid #555; margin: 2em auto; max-width: 800px; white-space: pre-wrap; }
+    textarea { width: 100%; height: 150px; background: #111; color: #fff; border: 1px solid #555; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>Code Mori</h1>
+  <p>A full-stack meditation on coding's essence: Know, Read, Create, Become. Each step fetches from the backend, building your path.</p>
+  
+  <!-- Stage buttons: Interactive journey, unique in its sequential revelation. -->
+  <button onclick="fetchStage('/know-code')">Stage 1: Know Code</button> 
+  <button onclick="fetchStage('/read-code')">Stage 2: Read Code</button>
+  
+  <!-- Create stage: Input for user creation, POST to backend. -->
+  <div>
+    <h2>Stage 3: Create Code</h2>
+    <textarea id="code-input" placeholder="Write your code snippet here..."></textarea>
+    <button onclick="createCode()">Submit Creation</button>
+  </div>
+  
+  <button onclick="fetchStage('/become-code')">Stage 4: Become Code</button>
+  
+  <div id="output"></div>
+
+  <script>
+    // Frontend logic: Simple fetches, reading responses like echoes from the void.
+    async function fetchStage(endpoint) {
+      try {
+        const res = await fetch(`http://localhost:3000${endpoint}`);
+        if (!res.ok) throw new Error('Backend whispers error.');
+        const data = await res.json();
+        // Display: Create the output, becoming the renderer of wisdom.
+        document.getElementById('output').innerHTML = `
+          <h3>${data.stage}</h3>
+          <p>${data.wisdom}</p>
+          <p><strong>Importance:</strong> ${data.importance}</p>
+          \( {data.snippet ? `<pre> \){data.snippet}</pre>` : ''}
+          \( {data.mergedCode ? `<pre> \){data.mergedCode}</pre>` : ''}
+          ${data.received ? `<pre>Received: ${data.received}</pre>` : ''}
+        `;
+      } catch (err) {
+        document.getElementById('output').innerText = `Error in the flow: ${err.message}. Retry the process.`;
+      }
+    }
+
+    async function createCode() {
+      const code = document.getElementById('code-input').value;
+      if (!code) return alert('Enter code to create.');
+      try {
+        const res = await fetch('http://localhost:3000/create-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json();
+        // After creation, display feedback—feel the merge beginning.
+        document.getElementById('output').innerHTML = `
+          <h3>${data.stage}</h3>
+          <p>${data.wisdom}</p>
+          <p><strong>Importance:</strong> ${data.importance}</p>
+          <pre>${data.received}</pre>
+        `;
+      } catch (err) {
+        document.getElementById('output').innerText = `Creation failed: ${err.message}.`;
+      }
+    }
+  </script>
+</body>
+</html>
